@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <title>Gestion des employé</title>
-    <link rel="stylesheet" href="./static/bootstrap.min.css">
-    <link rel="stylesheet" href="./static/font-awesome.css">
+    <link rel="stylesheet" href="../static/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/font-awesome.css">
 </head>
 <body>
 
@@ -17,7 +17,7 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li><a href="http://localhost:8080/employes?page=0&amp;size=10&amp;sortProperty=matricule&amp;sortDirection=ASC" class="nav-link">Liste des employés <span class="badge badge-primary">2499</span></a></li>
+                <li><a href="http://localhost:8080/employes?page=0&amp;size=10&amp;sortProperty=matricule&amp;sortDirection=ASC" class="nav-link">Liste des employés <span class="badge badge-primary" th:text="${nmEmploye}">2499</span></a></li>
             </ul>
 
             <form class="form-inline my-2 my-lg-0" role="search" action="http://localhost:8080/employes" method="GET">
@@ -32,7 +32,7 @@
 
 <div class="container mt-2">
     <div class="jumbotron">
-        <h1>Bienvenue dans l'interface de gestion des 2499 employés !</h1>
+        <h1>Bienvenue dans l'interface de gestion des <span th:text="${nmEmploye}">2499</span> employés !</h1>
         <p>Cette application web est paramétrée pour récupérer les données d'une base <em>entreprise</em> sur le serveur MySQL situé à <code>http://localhost:3306</code>.</p>
         <p>Il est nécessaire de développer les contrôleurs et de compléter les JSP existantes. Voici l'ensemble des fonctionnalités :</p>
         <ul class="list-group">
