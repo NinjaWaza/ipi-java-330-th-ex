@@ -3,8 +3,12 @@
 <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <title>Tous les employés</title>
-    <link rel="stylesheet" href="/static/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/font-awesome.css">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.5.0/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/4.7.0/css/font-awesome.css}"/>
+
+
+    <script src="/webjars/jquery/3.5.1/jquery.min.js" type="application/javascript"></script>
+    <script src="/webjars/bootstrap/4.5.0/js/bootstrap.bundle.min.js" type="application/javascript"></script>
 </head>
 <body>
 
@@ -16,27 +20,66 @@
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="#/employes/detail/newT" class="">Technicien</a></li>
-                <li><a href="#/employes/detail/newC" class="">Commercial</a></li>
-                <li><a href="#/employes/detail/newM" class="">Manager</a></li>
+                <li class="dropdown-item"><a href="/employes/new/technicien" class="">Technicien</a></li>
+                <li class="dropdown-item"><a href="/employes/new/commercial" class="">Commercial</a></li>
+                <li class="dropdown-item"><a href="/employes/new/manager" class="">Manager</a></li>
             </ul>
         </div>
         <table class="table table-hover table-striped">
             <thead>
             <tr>
+<!--                <th scope="col">-->
+<!--                    <a th:if="${#strings.equals(param.sortDirection,'DESC') and #strings.equals(param.sortProperty, 'matricule')}" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=ASC&sortProperty=matricule'}">Matricule <span class="glyphicon glyphicon-sort-by-alphabet"></span> <i class="fa fa-chevron-up"></i></a>-->
+<!--                    <a th:if="${#strings.equals(param.sortDirection,'ASC') and #strings.equals(param.sortProperty, 'matricule')}" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=DESC&sortProperty=matricule'}">Matricule <span class="glyphicon glyphicon-sort-by-alphabet-alt"></span> <i class="fa fa-chevron-down"></i></a>-->
+<!--                    <a th:if="${!#strings.equals(param.sortProperty, 'matricule')}" th:href="@{/employes(page=${param.page}, size=${param.size}, sortDirection='ASC', sortProperty='matricule')}">Matricule</a>-->
+<!--                </th>-->
                 <th scope="col">
-                    <a th:if="${currentSortDirection} == DESC" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=ASC&sortProperty=matricule'}">Matricule <span class="glyphicon glyphicon-sort-by-alphabet"></span></a>
-                    <a th:if="${currentSortDirection} == ASC" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=DESC&sortProperty=matricule'}">Matricule <span class="glyphicon glyphicon-sort-by-alphabet-alt"></span></a>
+                    <div th:if="${#strings.equals(param.sortProperty, 'matricule')}"
+                         th:switch="${param.sortDirection.toString()}">
+                        <span th:case="'DESC'">
+                            <a th:href="@{/employes(page=${param.page},size=${param.size},sortDirection='ASC',sortProperty='matricule')}">Matricule <i class="fa fa-chevron-down"></i></a>
+                        </span>
+                        <span th:case="'ASC'">
+                            <a th:href="@{/employes(page=${param.page},size=${param.size},sortDirection='DESC',sortProperty='matricule')}">Matricule <i class="fa fa-chevron-up"></i></a>
+                        </span>
+                    </div>
+                    <div th:if="${not #strings.equals(param.sortProperty, 'matricule')}">
+                        <a th:href="@{/employes(page=${param.page},size=${param.size},sortDirection='ASC',sortProperty='matricule')}">Matricule</a>
+                    </div>
+                </th>
+<!--                <th scope="col">-->
+<!--                    <a th:if="${#strings.equals(param.sortDirection,'DESC') and #strings.equals(param.sortProperty, 'nom')}" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=ASC&sortProperty=nom'}">Nom <span class="glyphicon glyphicon-sort-by-alphabet"></span><i class="fa fa-chevron-up"></i></a>-->
+<!--                    <a th:if="${#strings.equals(param.sortDirection,'ASC') and #strings.equals(param.sortProperty, 'nom')}" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=DESC&sortProperty=nom'}">Nom <span class="glyphicon glyphicon-sort-by-alphabet-alt"></span><i class="fa fa-chevron-down"></i></a>-->
+<!--                    <a th:if="${!#strings.equals(param.sortProperty, 'nom')}" th:href="@{/employes(page=${param.page}, size=${param.size}, sortDirection='ASC', sortProperty='nom')}">Nom</a>-->
+<!--                </th>-->
+                <th scope="col">
+                    <a th:href="@{/employes(page=${param.page},size=${param.size},sortDirection=${#strings.equals(param.sortProperty, 'nom') ? inverseSortDirection : 'ASC'},sortProperty='nom')}">
+                        Nom
+                        <i class="fa fa-chevron-up" th:if="${#strings.equals(param.sortProperty, 'nom') and #strings.equals(param.sortDirection, 'ASC')}"></i>
+                        <i class="fa fa-chevron-down" th:if="${#strings.equals(param.sortProperty, 'nom') and #strings.equals(param.sortDirection, 'DESC')}"></i>
+                    </a>
                 </th>
                 <th scope="col">
-                    <a th:if="${currentSortDirection} == DESC" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=ASC&sortProperty=nom'}">Nom <span class="glyphicon glyphicon-sort-by-alphabet"></span></a>
-                    <a th:if="${currentSortDirection} == ASC" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=DESC&sortProperty=nom'}">Nom <span class="glyphicon glyphicon-sort-by-alphabet-alt"></span></a>
+<!--                    <a th:if="${currentSortDirection} == DESC" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=ASC&sortProperty=prenom'}">Prénom<span class="glyphicon glyphicon-sort-by-alphabet"></span><i class="fa fa-chevron-up"></i></a>-->
+<!--                    <a th:if="${currentSortDirection} == ASC" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=DESC&sortProperty=prenom'}">Prénom <span class="glyphicon glyphicon-sort-by-alphabet-alt"></span><i class="fa fa-chevron-down"></i></a>-->
+                    <a th:if="${#strings.equals(param.sortDirection,'DESC') and #strings.equals(param.sortProperty, 'prenom')}" th:href="@{/employes(page=${param.page}, size=${param.size}, sortDirection='ASC', sortProperty='prenom')}">Prénom <span class="glyphicon glyphicon-sort-by-alphabet-alt"></span><i class="fa fa-chevron-up"></i></a>
+                    <a th:if="${#strings.equals(param.sortDirection,'ASC') and #strings.equals(param.sortProperty, 'prenom')}" th:href="@{/employes(page=${param.page}, size=${param.size}, sortDirection='DESC', sortProperty='prenom')}">Prénom<span class="glyphicon glyphicon-sort-by-alphabet"></span><i class="fa fa-chevron-down"></i></a>
+                    <a th:if="${!#strings.equals(param.sortProperty, 'prenom')}" th:href="@{/employes(page=${param.page}, size=${param.size}, sortDirection='ASC', sortProperty='prenom')}">Prénom</a>
                 </th>
                 <th scope="col">
-                    <a th:if="${currentSortDirection} == DESC" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=ASC&sortProperty=prenom'}">Prénom<span class="glyphicon glyphicon-sort-by-alphabet"></span></a>
-                    <a th:if="${currentSortDirection} == ASC" th:href="@{'/employes?page=' + ${currentPageNumber} +'&size=10&sortDirection=DESC&sortProperty=prenom'}">Prénom <span class="glyphicon glyphicon-sort-by-alphabet-alt"></span></a>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuPageSize" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown button
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuPageSize">
+                            <a class="dropdown-item" th:href="@{/employes(page=${param.page},size=5,sortDirection=${param.sortDirection},sortProperty=${param.sortProperty})}">5</a>
+                            <a class="dropdown-item" th:href="@{/employes(page=${param.page},size=10,sortDirection=${param.sortDirection},sortProperty=${param.sortProperty})}">10</a>
+                            <a class="dropdown-item" th:href="@{/employes(page=${param.page},size=20,sortDirection=${param.sortDirection},sortProperty=${param.sortProperty})}">20</a>
+                            <a class="dropdown-item" th:href="@{/employes(page=${param.page},size=50,sortDirection=${param.sortDirection},sortProperty=${param.sortProperty})}">50</a>
+                            <a class="dropdown-item" th:href="@{/employes(page=${param.page},size=${allEmployes.totalElements},sortDirection=${param.sortDirection},sortProperty=${param.sortProperty})}">All</a>
+                        </div>
+                    </div>
                 </th>
-                <th scope="col"></th>
             </tr>
             </thead>
             <tbody>
@@ -44,22 +87,34 @@
                 <th scope="row" th:text="${anEmploye.matricule}">Matricule</th>
                 <td th:text="${anEmploye.nom}" >Nom</td>
                 <td th:text="${anEmploye.prenom}">Prénom</td>
-                <td><a th:href="'http://localhost:8080/employes/' + (${anEmploye.id})" class="btn btn-primary ">Détail</a></td>
+<!--                <td><a th:href="'http://localhost:8080/employes/' + (${anEmploye.id})" class="btn btn-primary ">Détail</a></td>-->
+                <td><a th:href="|/employes/${anEmploye.id}|" class="btn btn-primary ">Détail</a></td>
             </tr>
             </tbody>
         </table>
         <div class="row">
-            <div class="col-lg-6"><p>Affichage des employés [[${#request.getParameter('page')}*${#request.getParameter('size')}+1]] à [[${#request.getParameter('page')}*${#request.getParameter('size')}+${#request.getParameter('size')}]] sur un total de [[${total}]]</p>
+<!--            <div class="col-lg-6"><p>Affichage des employés [[${#request.getParameter('page')}*${#request.getParameter('size')}+1]] à [[${#request.getParameter('page')}*${#request.getParameter('size')}+${#request.getParameter('size')}]] sur un total de [[${allEmployes.totalElements}]]</p>-->
+<!--            </div>-->
+            <div class="col-lg-6"><p>Affichage des employés
+                <span th:text="${start}">11</span>
+                à <span th:text="${(allEmployes.number + 1) * allEmployes.numberOfElements}">20</span> sur un total de
+                <span th:text="${allEmployes.totalElements}">2504</span></p>
             </div>
             <div class="col-lg-6">
                 <ul class="pagination">
                     <li class="disabled">
-                        <a th:href="'http://localhost:8080/employes?page=' + (${currentPageNumber}-1)+ '&size=10&sortDirection=ASC&sortProperty=matricule'" class="" th:unless="${#request.getParameter('page')} == 0"> «
-                        </a> </li>
+<!--                        <a th:href="'http://localhost:8080/employes?page=' + (${currentPageNumber}-1)+ '&size=10&sortDirection=ASC&sortProperty=matricule'" class="" th:unless="${#request.getParameter('page')} == 0"> «-->
+<!--                        </a>-->
+                        <a th:href="@{/employes(page=${allEmployes.number - 1}, size=${param.size}, sortDirection=${param.sortDirection}, sortProperty=${param.sortProperty})}" class="page-link" th:unless="${#request.getParameter('page')} == 0"> «
+                        </a>
+                    </li>
                     <li><a href="#" th:text="'page ' + (${#request.getParameter('page')}+1)">Page number</a></li>
                     <li class="">
-                        <a th:href="'http://localhost:8080/employes?page=' + (${currentPageNumber}+1)+ '&size=10&sortDirection=ASC&sortProperty=matricule'" th:unless="${#request.getParameter('page')} >= ${maxPage}"> »
-                        </a> </li>
+<!--                        <a th:href="'http://localhost:8080/employes?page=' + (${currentPageNumber}+1)+ '&size='+${param.size}+'&sortDirection=ASC&sortProperty=matricule'" th:unless="${#request.getParameter('page')} >= ${maxPage}"> »-->
+<!--                        </a>-->
+                        <a th:href="'http://localhost:8080/employes?page=' + (${currentPageNumber}+1)+ '&size='+${param.size}+'&sortDirection=ASC&sortProperty=matricule'" th:unless="${allEmployes.last}"> »
+                        </a>
+                    </li>
                 </ul></div>
         </div>
     </div>
