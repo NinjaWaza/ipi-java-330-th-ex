@@ -22,6 +22,9 @@ public class IndexController {
         model.put("nom", "IPI");
         Long numberOfEmploye = this.employeService.countAllEmploye();
         model.put("nmEmploye", numberOfEmploye);
+        model.put("title", "Acceuil - main page");
+        model.put("page","acceuil");
+        model.put("fragment","home");
         return "accueil";
     }
 }

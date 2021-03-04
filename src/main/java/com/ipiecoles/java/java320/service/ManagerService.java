@@ -38,7 +38,7 @@ public class ManagerService {
         Manager manager = m.get();
         Technicien technicien = t.get();
 
-        if(technicien.getManager().getId().equals(manager.getId())){
+        if(!technicien.getManager().getId().equals(manager.getId())){
             throw new IllegalArgumentException("Le manager d'identifiant " + idManager + " n'a pas le technicien d'identifiant " + idTechnicien + " dans son équipe");
         }
 

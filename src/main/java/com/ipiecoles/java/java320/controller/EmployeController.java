@@ -19,6 +19,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -43,12 +44,15 @@ public class EmployeController {
         model.put("employe", theEmploye);
         if(theEmploye instanceof Commercial){
             model.put("commercial", (Commercial)this.employeService.findById(id));
+            model.put("title", "Détail Commercial "+theEmploye.getMatricule());
         }
         if(theEmploye instanceof Technicien){
             model.put("technicien", (Technicien)this.employeService.findById(id));
+            model.put("title", "Détail Technicien "+theEmploye.getMatricule());
         }
         if(theEmploye instanceof Manager){
             model.put("manager", (Manager)this.employeService.findById(id));
+            model.put("title", "Détail Manager "+theEmploye.getMatricule());
         }
         return "detail";
     }
@@ -57,6 +61,7 @@ public class EmployeController {
     public String searchEmployeByMatricuel(@RequestParam String matricule,
                                            final ModelMap model){
         model.put("employe",this.employeService.findMyMatricule(matricule));
+        model.put("title", "Détail employé ");
         return "detail";
     }
 
@@ -77,6 +82,7 @@ public class EmployeController {
         model.put("currentSortDirection",sortDirection);
         model.put( "start" , page * size + 1 ) ;
         model.put("inverseSortDirection", sortDirection.equals("ASC") ? "DESC":"ASC");
+        model.put("title", "Liste de tous les employés");
         return "allEmployes";
     }
 
@@ -90,6 +96,7 @@ public class EmployeController {
             default: throw new IllegalArgumentException("Type d'employé incorrect !");
         }
         model.put("employe", employe);
+        model.put("title", "Détail employé");
         return "detail";
     }
 
@@ -104,7 +111,10 @@ public class EmployeController {
     }
 
     @PostMapping(value = "/manager", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String createManager(Manager employe, final ModelMap model){
+    public String createManager(Manager employe, final ModelMap model) throws Exception {
+        if(employe.getDateEmbauche() == null){
+            employe.setDateEmbauche(LocalDate.now());
+        }
         return saveEmploye(employe,model);
     }
 
@@ -119,7 +129,16 @@ public class EmployeController {
     }
 
     @PostMapping(value = "/manager/{id}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String updateManager(@PathVariable("id") Long id,Manager employe, final ModelMap model){
+    public String updateManager(@PathVariable("id") Long id,Manager employe, final ModelMap model) throws Exception {
+        if(employe.getDateEmbauche() == null){
+            employe.setDateEmbauche(LocalDate.now());
+        }
+        if(employe.getSalaire() == null){
+            employe.setSalaire(1480.27d);
+        }
+        if(employe.getSalaire()!=null){
+            employe.setSalaire(employe.getSalaire());
+        }
         return updateEmploye(employe,model);
     }
 

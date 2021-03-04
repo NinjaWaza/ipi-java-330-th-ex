@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -91,6 +92,17 @@ public class EmployeService {
         }
         if(employeRepository.findByMatricule(employe.getMatricule()) != null && !employe.getId().equals(id)){
             throw new EntityExistsException("Il existe déjà un employé avec le matricule " + employe.getMatricule());
+        }
+        if(employe.getDateEmbauche() == null){
+            LocalDate dateEmbauche = LocalDate.now();
+            dateEmbauche = this.employeRepository.findByMatricule(employe.getMatricule()).getDateEmbauche() != null ? this.employeRepository.findByMatricule(employe.getMatricule()).getDateEmbauche() : LocalDate.now();
+            try{
+                employe.setDateEmbauche(dateEmbauche);
+            }
+            catch (Exception e){
+                System.out.println("Erreur attention !!!");
+            }
+
         }
         return employeRepository.save(employe);
     }
