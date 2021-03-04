@@ -17,8 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
@@ -68,7 +71,7 @@ public class EmployeController {
     //On peut ajouter , params = { "page", "size", "sortDirection" , "sortProperty"} dans @GetMapping mais du coup on n'utilisera jamais les valeurs pas défaut
     // car le seul moyen d'afficher cette route sera d'utilisé les 4 paramètres.
     @GetMapping(value="")
-    public String getByMatricule(@RequestParam(name = "page",defaultValue = "0") Integer page,
+    public String allEmployees(@RequestParam(name = "page",defaultValue = "0") Integer page,
                                  @RequestParam(name = "size",defaultValue = "10") Integer size,
                                  @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection,
                                  @RequestParam(name = "sortProperty", defaultValue = "matricule") String sortProperty,
@@ -83,6 +86,7 @@ public class EmployeController {
         model.put( "start" , page * size + 1 ) ;
         model.put("inverseSortDirection", sortDirection.equals("ASC") ? "DESC":"ASC");
         model.put("title", "Liste de tous les employés");
+        model.put("sizes", Arrays.asList("5","10","20","50"));
         return "allEmployes";
     }
 
@@ -101,35 +105,35 @@ public class EmployeController {
     }
 
     @PostMapping(value = "/technicien", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String createTechnicien(Technicien employe, final ModelMap model){
-        return saveEmploye(employe,model);
+    public String createTechnicien(Technicien employe, final ModelMap model, RedirectAttributes attributes){
+        return saveEmploye(employe,model, attributes);
     }
 
     @PostMapping(value = "/commercial", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String createCommercial(Commercial employe, final ModelMap model){
-        return saveEmploye(employe,model);
+    public String createCommercial(Commercial employe, final ModelMap model, RedirectAttributes attributes){
+        return saveEmploye(employe,model, attributes);
     }
 
     @PostMapping(value = "/manager", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String createManager(Manager employe, final ModelMap model) throws Exception {
+    public String createManager(Manager employe, final ModelMap model, RedirectAttributes attributes) throws Exception {
         if(employe.getDateEmbauche() == null){
             employe.setDateEmbauche(LocalDate.now());
         }
-        return saveEmploye(employe,model);
+        return saveEmploye(employe,model, attributes);
     }
 
     @PostMapping(value = "/commercial/{id}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String updateCommercial(Commercial employe, final ModelMap model){
-        return updateEmploye(employe,model);
+    public String updateCommercial(Commercial employe, final ModelMap model, RedirectAttributes attributes){
+        return updateEmploye(employe,model, attributes);
     }
 
     @PostMapping(value = "/technicien/{id}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String updateTechnicien(Technicien employe, final ModelMap model){
-        return updateEmploye(employe,model);
+    public String updateTechnicien(Technicien employe, final ModelMap model, RedirectAttributes attributes){
+        return updateEmploye(employe,model, attributes);
     }
 
     @PostMapping(value = "/manager/{id}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String updateManager(@PathVariable("id") Long id,Manager employe, final ModelMap model) throws Exception {
+    public String updateManager(@PathVariable("id") Long id,Manager employe, final ModelMap model, RedirectAttributes attributes) throws Exception {
         if(employe.getDateEmbauche() == null){
             employe.setDateEmbauche(LocalDate.now());
         }
@@ -139,24 +143,50 @@ public class EmployeController {
         if(employe.getSalaire()!=null){
             employe.setSalaire(employe.getSalaire());
         }
-        return updateEmploye(employe,model);
+        return updateEmploye(employe,model, attributes);
     }
 
     @GetMapping(value = "/{id}/delete")
-    public String deleteEmploye(@PathVariable("id") Long id){
-        this.employeService.deleteEmploye(id);
+    public String deleteEmploye(@PathVariable("id") Long id, RedirectAttributes attributes){
+
+        try{
+            this.employeService.deleteEmploye(id);
+        }
+        catch(Exception e)
+        {
+            attributes.addFlashAttribute("type","danger");
+            attributes.addFlashAttribute("message","Erreur lors de la sauvegarde de l'employé !");
+        }
         return "redirect:/employes";
     }
 
-    private String saveEmploye(Employe employe, ModelMap model){
-        employe = employeService.creerEmploye(employe);
-        model.put("employe", employe);
+    private String saveEmploye(Employe employe, ModelMap model, RedirectAttributes attributes){
+        try{
+            employe = employeService.creerEmploye(employe);
+            attributes.addFlashAttribute("message", "Ajout de l'employé effectuée");
+            model.put("employe", employe);
+            attributes.addFlashAttribute("type", "success");
+        }
+        catch(Exception e)
+        {
+         attributes.addFlashAttribute("type","danger");
+         attributes.addFlashAttribute("message","Erreur lors de la sauvegarde de l'employé !");
+        }
         return "redirect:/employes/" + employe.getId();
     }
 
-    private String updateEmploye(Employe employe, ModelMap model){
-        employe = employeService.updateEmploye(employe.getId(),employe);
-        model.put("employe", employe);
+    private String updateEmploye(Employe employe, ModelMap model, RedirectAttributes attributes){
+        try{
+            employe = employeService.updateEmploye(employe.getId(),employe);
+            attributes.addFlashAttribute("message", "Modification de l'employé effectuée");
+            model.put("employe", employe);
+            attributes.addFlashAttribute("type", "success");
+        }
+        catch(Exception e)
+        {
+            attributes.addFlashAttribute("type","danger");
+            attributes.addFlashAttribute("message","Erreur lors de la mise à jour de l'employé !");
+        }
         return "redirect:/employes/" + employe.getId();
     }
 }

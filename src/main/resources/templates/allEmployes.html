@@ -71,6 +71,16 @@
                         </div>
                     </div>
                 </th>
+                <th>
+                    <form action="/employes" method="get">
+                        <select name="size" id="sizePicker" class="custom-select" onchange="javascript:this.form.submit()">
+                            <option th:each="s : ${sizes}" th:value="${s}" th:text="${s}" th:selected="${#strings.equals(s,param.size)}"></option>
+                        </select>
+                        <input type="hidden" name="sortDirection" th:value="${param.sortDirection}">
+                        <input type="hidden" name="sortProperty" th:value="${param.sortProperty}">
+                        <input type="hidden" name="page" value="0">
+                    </form>
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -100,6 +110,19 @@
                         </a>
                     </li>
                     <li><a href="#" th:text="'page ' + (${#request.getParameter('page')}+1)">Page number</a></li>
+                    <li>
+                        <form action="/employes" method="get">
+                            <select name="page" id="pagePicker" class="custom-select"
+                                    onchange="javascript:this.form.submit()">
+                                <option th:each="p : ${#numbers.sequence(1, employes.totalPages)}"
+                                        th:value="${p - 1}" th:text="|Page ${p}|"
+                                        th:selected="${p - 1 == employes.number}"></option>
+                            </select>
+                            <input type="hidden" name="sortDirection" th:value="${param.sortDirection}">
+                            <input type="hidden" name="sortProperty" th:value="${param.sortProperty}">
+                            <input type="hidden" name="size" th:value="${param.size}">
+                        </form>
+                    </li>
                     <li class="">
 <!--                        <a th:href="'http://localhost:8080/employes?page=' + (${currentPageNumber}+1)+ '&size='+${param.size}+'&sortDirection=ASC&sortProperty=matricule'" th:unless="${#request.getParameter('page')} >= ${maxPage}"> »-->
 <!--                        </a>-->
